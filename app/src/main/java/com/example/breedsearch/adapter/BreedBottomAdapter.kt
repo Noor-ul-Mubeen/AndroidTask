@@ -11,14 +11,13 @@ import com.example.breedsearch.R
 import com.example.breedsearch.model.BreedModel
 
 
-class BreedBottomAdapter(var context: Context) :
+class BreedBottomAdapter(private var context: Context) :
     RecyclerView.Adapter<BreedBottomAdapter.ViewHolder>() {
 
     private lateinit var listener: BreedSelectInterface
-    lateinit var dataset: List<BreedModel>
+    private lateinit var dataset: List<BreedModel>
 
     constructor(context: Context, dataset: List<BreedModel>, listener:BreedSelectInterface) : this(context) {
-        this.context = context
         this.dataset = dataset
         this.listener = listener
     }
@@ -37,9 +36,9 @@ class BreedBottomAdapter(var context: Context) :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.textview.apply {
-            setText(dataset[position].name)
+            text = dataset[position].name
             setOnClickListener {
-                listener.BreedSelected(dataset[position])
+                listener.breedSelected(dataset[position])
             }
         }
     }

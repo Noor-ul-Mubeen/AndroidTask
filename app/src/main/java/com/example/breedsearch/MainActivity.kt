@@ -1,5 +1,6 @@
 package com.example.breedsearch
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -37,17 +38,28 @@ class MainActivity : AppCompatActivity(), BreedSelectInterface {
 
         }
         getBreedList()
-        observerViewModel()
+        observerBreedData()
+        observeImageList()
 
 
     }
 
-    private fun observerViewModel() {
+    private fun observeImageList() {
+        viewModel.imagesData?.observe(this, {
+            viewModel.isProcessing.value = false
+            binding.imagesView.apply{
+                adapter = ImageRecycleAdapter(this@MainActivity, it)
+                layoutManager = GridLayoutManager(this@MainActivity, 3)
+            }
+        })
+    }
+
+    private fun observerBreedData() {
         viewModel.breedData?.observe(this,{
             viewModel.isProcessing.value = false
-            binding.selectedBreed.setOnClickListener(View.OnClickListener { view ->
+            binding.selectedBreed.setOnClickListener { view ->
                 showBottomSheetDialog(it)
-            })
+            }
         })
 
 
@@ -57,7 +69,7 @@ class MainActivity : AppCompatActivity(), BreedSelectInterface {
         viewModel.getBreeds()
     }
 
-    override fun BreedSelected(selectedBreed: BreedModel?) {
+    override fun breedSelected(selectedBreed: BreedModel?) {
         if (selectedBreed != null) {
             getDogImage(selectedBreed)
             bottomSheetDialog.dismiss()
@@ -74,22 +86,12 @@ class MainActivity : AppCompatActivity(), BreedSelectInterface {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun getDogImage(breedModel: BreedModel) {
         viewModel.getImages( breedModel)
-        viewModel.imagesData?.observe(this, {
-            viewModel.isProcessing.value = false
-            binding.imagesView.apply{
-                adapter = ImageRecycleAdapter(this@MainActivity, it)
-                layoutManager = GridLayoutManager(this@MainActivity, 3)
-                setScrollListener()
-            }
-        })
-    }
-
-    private fun setScrollListener() {
+        observeImageList()
 
     }
-
 }
 
 

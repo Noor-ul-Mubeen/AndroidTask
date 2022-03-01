@@ -16,13 +16,14 @@ import com.google.gson.reflect.TypeToken
 
 class BreedRepository(application: Context) {
     private val context: Context = application
-    val url = "https://api.thedogapi.com/v1"
     val gson = Gson()
     val breedData: MutableLiveData<List<BreedModel>> = MutableLiveData<List<BreedModel>>()
 
     fun getBreedList(): MutableLiveData<List<BreedModel>> {
         val breedListRequest: JsonArrayRequest = object : JsonArrayRequest(
-            Method.GET, url + "/breeds", null,
+            Method.GET,
+            "${Constants.BASE_URL}/breeds",
+            null,
             Response.Listener {
                 val sType = object : TypeToken<List<BreedModel>>() {}.type
                 breedData.value = gson.fromJson(it.toString(), sType)
@@ -32,12 +33,7 @@ class BreedRepository(application: Context) {
             }) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-                var params: MutableMap<String, String>? = super.getHeaders()
-                if (params == null || params.isEmpty())
-                    params = HashMap()
-
-                params["x-api-key"] = "ABC123"
-                return params
+                return authHeaders(super.getHeaders())
             }
         }
 
@@ -50,7 +46,7 @@ class BreedRepository(application: Context) {
             MutableLiveData<List<DogImageModel>>()
 
         val requestURL =
-            url + "/images/search?limit=" + Constants.PAGE_SIZE + "&breed_id=" + breedId
+            Constants.BASE_URL + "/images/search?limit=" + Constants.PAGE_SIZE + "&breed_id=" + breedId
 
         val imagesRequest: JsonArrayRequest = object : JsonArrayRequest(
             Method.GET,
@@ -66,17 +62,22 @@ class BreedRepository(application: Context) {
             }) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-                var params: MutableMap<String, String>? = super.getHeaders()
-                if (params == null || params.isEmpty())
-                    params = HashMap()
-
-                params["x-api-key"] = "ABC123"
-                return params
+                return authHeaders(super.getHeaders())
             }
         }
 
         APIQueue.getInstance(context).addToRequestQueue(imagesRequest)
         return imagesData
     }
+
+    private fun authHeaders(headers: MutableMap<String, String>): Map<String, String> {
+        var params: MutableMap<String, String>? = headers
+        if (params == null || params.isEmpty())
+            params = HashMap()
+
+        params["x-api-key"] = "ABC123"
+        return params
+    }
+
 
 }

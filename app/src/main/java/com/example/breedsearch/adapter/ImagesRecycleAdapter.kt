@@ -6,14 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.breedsearch.databinding.ImageRecycleItemBinding
 import com.example.breedsearch.model.DogImageModel
-import android.graphics.Movie
-import com.example.breedsearch.utils.Constants
 
 
-class ImageRecycleAdapter(var context: Context) :
+class ImageRecycleAdapter(private var context: Context) :
     RecyclerView.Adapter<ImageRecycleAdapter.ItemViewHolder>() {
 
-    lateinit var dataset: List<DogImageModel>
+    private lateinit var dataset: List<DogImageModel>
 
     constructor(context: Context, dataset: List<DogImageModel>) : this(context) {
         this.context = context
@@ -29,11 +27,6 @@ class ImageRecycleAdapter(var context: Context) :
         }
     }
 
-    fun add(dogImage: DogImageModel) {
-        dataset.toMutableList().add(dogImage)
-        notifyItemInserted(dataset.size - 1)
-    }
-
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ItemViewHolder {
 
         return ItemViewHolder(ImageRecycleItemBinding.inflate(LayoutInflater.from(viewGroup.context)))
@@ -45,10 +38,6 @@ class ImageRecycleAdapter(var context: Context) :
     }
 
     override fun getItemCount(): Int {
-        if (dataset.size == Constants.PAGE_SIZE)
-            return dataset.size + 1
-
         return dataset.size
     }
-
 }
