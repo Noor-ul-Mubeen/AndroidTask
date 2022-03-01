@@ -1,38 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
+
     <data>
+
+        <import type="android.view.View" />
+
         <variable
-            name="MainViewModel"
-            type="com.example.breedsearch.ViewModel.MainViewModel" />
-        <variable
-            name="NotesViewModel"
-            type="com.example.breedsearch.ViewModel.BreedViewModel" />
+            name="mainViewModel"
+            type="com.example.breedsearch.viewModel.MainViewModel" />
     </data>
 
-    <Spinner
-        android:id="@+id/planets_spinner"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_height="match_parent">
 
-        android:background="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:id="@+id/selected_breed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="@{mainViewModel.isProcessing? View.GONE : View.VISIBLE}">
 
-    <GridView
-        android:numColumns="3"
-        android:id="@+id/images_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/planets_spinner" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@{mainViewModel.selectedBreed!=null? mainViewModel.selectedBreed.name: @string/app_name}"
+                    android:textColor="@color/black"
+                    android:textSize="30dp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:src="@drawable/ic_baseline_arrow_drop_down_24" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/images_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:layout_width="match_parent"
+
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
 </layout>

@@ -2,37 +2,94 @@ package com.example.breedsearch
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Spinner
+import android.view.View
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil.setContentView
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import com.example.breedsearch.Model.BreedModel
-import com.example.breedsearch.ViewModel.MainViewModel
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.breedsearch.adapter.BreedBottomAdapter
+import com.example.breedsearch.model.BreedModel
+import com.example.breedsearch.viewModel.MainViewModel
 import com.example.breedsearch.databinding.ActivityMainBinding
-import androidx.lifecycle.ViewModelProvider
+import com.example.breedsearch.viewModel.MainViewModelFactory
+
+import androidx.recyclerview.widget.RecyclerView
+import com.example.breedsearch.callbackInterface.BreedSelectInterface
+import com.example.breedsearch.adapter.ImageRecycleAdapter
+
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
+class MainActivity : AppCompatActivity(), BreedSelectInterface {
+    private val viewModel by viewModels<MainViewModel> {
+        MainViewModelFactory(application)
+    }
 
-
-class MainActivity : AppCompatActivity() {
-    lateinit var spinner:Spinner
-    lateinit var viewModel: MainViewModel
     lateinit var binding: ActivityMainBinding
+    lateinit var bottomSheetDialog: BottomSheetDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = setContentView(this, R.layout.activity_main)
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        binding.mainViewModel = viewModel
+        binding.apply{
+            lifecycleOwner = this@MainActivity
+            mainViewModel = viewModel
+
+        }
         getBreedList()
+        observerViewModel()
+
+
+    }
+
+    private fun observerViewModel() {
+        viewModel.breedData?.observe(this,{
+            viewModel.isProcessing.value = false
+            binding.selectedBreed.setOnClickListener(View.OnClickListener { view ->
+                showBottomSheetDialog(it)
+            })
+        })
+
 
     }
 
     private fun getBreedList() {
-        viewModel.getBreeds().observe(this, Observer<List<BreedModel>>{ breeds ->
-            // update UI
+        viewModel.getBreeds()
+    }
+
+    override fun BreedSelected(selectedBreed: BreedModel?) {
+        if (selectedBreed != null) {
+            getDogImage(selectedBreed)
+            bottomSheetDialog.dismiss()
+        }
+    }
+
+    private fun showBottomSheetDialog(breeds: List<BreedModel>) {
+        bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(R.layout.breed_bottom_layout)
+        bottomSheetDialog.findViewById<RecyclerView>(R.id.breedListView)?.apply {
+            adapter = BreedBottomAdapter(applicationContext, breeds, this@MainActivity)
+            layoutManager = LinearLayoutManager(applicationContext)
+            bottomSheetDialog.show()
+        }
+    }
+
+    private fun getDogImage(breedModel: BreedModel) {
+        viewModel.getImages( breedModel)
+        viewModel.imagesData?.observe(this, {
+            viewModel.isProcessing.value = false
+            binding.imagesView.apply{
+                adapter = ImageRecycleAdapter(this@MainActivity, it)
+                layoutManager = GridLayoutManager(this@MainActivity, 3)
+                setScrollListener()
+            }
         })
+    }
+
+    private fun setScrollListener() {
 
     }
+
 }
+
 
