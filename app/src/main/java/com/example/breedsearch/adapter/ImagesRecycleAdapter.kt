@@ -20,9 +20,8 @@ class ImageRecycleAdapter(private var context: Context) :
 
     class ItemViewHolder(private var binding: ImageRecycleItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(dogImageModel: DogImageModel, lastElement: Boolean) {
+        fun bind(dogImageModel: DogImageModel) {
             binding.dogImage = dogImageModel
-            binding.lastElement = lastElement
             binding.executePendingBindings()
         }
     }
@@ -34,7 +33,7 @@ class ImageRecycleAdapter(private var context: Context) :
 
     override fun onBindViewHolder(itemViewHolder: ItemViewHolder, position: Int) {
         val dogImage = dataset[position]
-        itemViewHolder.bind(dogImage, position == dataset.size)
+        itemViewHolder.bind(dogImage)
     }
 
     override fun getItemCount(): Int {

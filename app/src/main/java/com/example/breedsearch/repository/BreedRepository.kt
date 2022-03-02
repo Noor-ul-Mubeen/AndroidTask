@@ -7,6 +7,7 @@ import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.example.breedsearch.aPI.APIQueue
+import com.example.breedsearch.callbackInterface.ErrorInterface
 import com.example.breedsearch.model.BreedModel
 import com.example.breedsearch.model.DogImageModel
 import com.example.breedsearch.utils.Constants
@@ -14,8 +15,9 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 
-class BreedRepository(application: Context) {
+class BreedRepository(application: Context, listener: ErrorInterface) {
     private val context: Context = application
+    private val errorListener: ErrorInterface = listener
     val gson = Gson()
     val breedData: MutableLiveData<List<BreedModel>> = MutableLiveData<List<BreedModel>>()
 
@@ -29,7 +31,7 @@ class BreedRepository(application: Context) {
                 breedData.value = gson.fromJson(it.toString(), sType)
 
             }, Response.ErrorListener {
-                print(it)//To change body of created functions use File | Settings | File Templates.
+                errorListener.errorCallback(it.message)//To change body of created functions use File | Settings | File Templates.
             }) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
@@ -58,7 +60,7 @@ class BreedRepository(application: Context) {
 
             },
             Response.ErrorListener {
-                print(it)//To change body of created functions use File | Settings | File Templates.
+                errorListener.errorCallback(it.message)
             }) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {

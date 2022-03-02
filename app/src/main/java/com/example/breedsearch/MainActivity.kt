@@ -1,9 +1,8 @@
 package com.example.breedsearch
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil.setContentView
 import androidx.recyclerview.widget.GridLayoutManager
@@ -40,8 +39,17 @@ class MainActivity : AppCompatActivity(), BreedSelectInterface {
         getBreedList()
         observerBreedData()
         observeImageList()
+        observeErrorMessage()
 
 
+    }
+
+    private fun observeErrorMessage() {
+        viewModel.errorLiveMessage.observe(this,{
+            if (!it.isEmpty()){
+                Toast.makeText(this, it,Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     private fun observeImageList() {
@@ -86,7 +94,6 @@ class MainActivity : AppCompatActivity(), BreedSelectInterface {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private fun getDogImage(breedModel: BreedModel) {
         viewModel.getImages( breedModel)
         observeImageList()
