@@ -1,44 +1,68 @@
 package com.example.breedsearch.viewModel
 
-import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.breedsearch.callbackInterface.ErrorInterface
-import com.example.breedsearch.model.BreedModel
-import com.example.breedsearch.repository.BreedRepository
-import com.example.breedsearch.model.DogImageModel
+import com.example.domain.common.Result
+import com.example.domain.model.BreedModel
+import com.example.domain.model.DogImageModel
+import com.example.domain.useCases.GetBreedsUseCase
+import com.example.domain.useCases.GetImageUseCase
 import kotlinx.coroutines.launch
 
-class MainViewModel(application: Application) : ViewModel(),ErrorInterface {
-    private val breedRepository: BreedRepository = BreedRepository(application, this)
+class MainViewModel(
+    private val getBreedsUseCase: GetBreedsUseCase,
+    private val getImageUseCase: GetImageUseCase,
+) : ViewModel() {
 
-    var selectedBreed: MutableLiveData<BreedModel>?= MutableLiveData()
-    var breedData: MutableLiveData<List<BreedModel>>?= MutableLiveData()
-    var imagesData: MutableLiveData<List<DogImageModel>>?= MutableLiveData()
-    val isProcessing: MutableLiveData<Boolean> = MutableLiveData(true)
-    val errorLiveMessage: MutableLiveData<String> = MutableLiveData("")
+    var selectedBreed: MutableLiveData<BreedModel>? = MutableLiveData()
+    private val _breedData = MutableLiveData<List<BreedModel>>()
+    val breedData = _breedData
 
-    override fun errorCallback(errorMessage: String?) {
-        if (!errorMessage.isNullOrEmpty()){
-            isProcessing.value = false
-            errorLiveMessage.value = errorMessage
+    private val _imagesData = MutableLiveData<List<DogImageModel>>()
+    val imagesData = _imagesData
 
-        }
-    }
+    private val _dataLoading = MutableLiveData(true)
+    val dataLoading: LiveData<Boolean> = _dataLoading
+
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> = _error
 
     fun getBreeds() {
-        isProcessing.value = true
         viewModelScope.launch {
-            breedData = breedRepository.getBreedList()
+            _dataLoading.postValue(true)
+            when (val breedResults = getBreedsUseCase.invoke()) {
+                is Result.Success -> {
+                    _breedData.value = breedResults.data
+                    _dataLoading.postValue(false)
+                }
+
+                is Result.Error -> {
+                    _dataLoading.postValue(false)
+                    _breedData.value = emptyList()
+                    _error.postValue(breedResults.exception.message)
+                }
+            }
         }
     }
 
     fun getImages(selectedBreed: BreedModel) {
         this.selectedBreed?.value = selectedBreed
-        isProcessing.value = true
         viewModelScope.launch {
-            imagesData = breedRepository.getImageList(selectedBreed.id)
+            _dataLoading.postValue(true)
+            when (val imagesResult = getImageUseCase.invoke(selectedBreed)) {
+                is Result.Success -> {
+                    _imagesData.value = imagesResult.data
+                    _dataLoading.postValue(false)
+                }
+
+                is Result.Error -> {
+                    _dataLoading.postValue(false)
+                    _breedData.value = emptyList()
+                    _error.postValue(imagesResult.exception.message)
+                }
+            }
         }
     }
 }

@@ -5,8 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.breedsearch.databinding.ImageRecycleItemBinding
-import com.example.breedsearch.model.DogImageModel
-
+import com.example.domain.model.DogImageModel
 
 class ImageRecycleAdapter(private var context: Context) :
     RecyclerView.Adapter<ImageRecycleAdapter.ItemViewHolder>() {

@@ -1,30 +1,21 @@
 package com.example.breedsearch.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.breedsearch.callbackInterface.BreedSelectInterface
 import com.example.breedsearch.R
-import com.example.breedsearch.model.BreedModel
+import com.example.breedsearch.callbackInterface.BreedSelectInterface
+import com.example.domain.model.BreedModel
 
-
-class BreedBottomAdapter(private var context: Context) :
+class BreedBottomAdapter(
+    private val dataset: List<BreedModel>,
+    private val listener: BreedSelectInterface
+) :
     RecyclerView.Adapter<BreedBottomAdapter.ViewHolder>() {
-
-    private lateinit var listener: BreedSelectInterface
-    private lateinit var dataset: List<BreedModel>
-
-    constructor(context: Context, dataset: List<BreedModel>, listener:BreedSelectInterface) : this(context) {
-        this.dataset = dataset
-        this.listener = listener
-    }
-
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textview: TextView = view.findViewById(R.id.breedName)
-
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
@@ -44,6 +35,4 @@ class BreedBottomAdapter(private var context: Context) :
     }
 
     override fun getItemCount() = dataset.size
-
-
 }

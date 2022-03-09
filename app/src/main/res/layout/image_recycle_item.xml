@@ -5,7 +5,7 @@
         <import type="android.view.View" />
         <variable
             name="dogImage"
-            type="com.example.breedsearch.model.DogImageModel" />
+            type="com.example.domain.model.DogImageModel" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
