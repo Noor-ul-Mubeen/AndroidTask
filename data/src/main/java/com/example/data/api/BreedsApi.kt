@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface BreedApi {
-    @GET("/v2/breeds")
+    @GET("/v1/breeds")
     suspend fun getBreeds(): Response<List<BreedItem>>
 
     @GET("/v1/images/search")
